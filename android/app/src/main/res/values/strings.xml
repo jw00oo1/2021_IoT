@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">iot</string>
+    <string name="button1">start</string>
+    <string name="button2">end</string>
+    <string name="macro1">macro1</string>
+    <string name="macro2">macro2</string>
+</resources>
