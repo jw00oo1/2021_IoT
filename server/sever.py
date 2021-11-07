@@ -47,15 +47,16 @@ vx_pre, vy_pre, vx_now, vy_now = 0, 0, 0, 0
 x_history = np.array([0])
 y_history = np.array([0])
 start = 1
+acc_threshold = 0.07
 threshold = 0.03
-dpi = 1000
+dpi = 1600
 
 # fig, ax = plt.subplots(2,1)
 
-def init_var(var1, var2=None):
-    if abs(var1) < threshold:
+def init_var(var1, var2=None, thres=threshold):
+    if abs(var1) < thres:
         var1 = 0
-    if var2 and abs(var2) < threshold:
+    if var2 and abs(var2) < thres:
         var2 = 0
     return (var1, var2) if var2 is not None else var1
 
@@ -89,6 +90,7 @@ if __name__ == '__main__':
                 
                 t_interval = (c_time - b_time) / 1000
 
+                x_acc, y_acc = init_var(x_acc, y_acc, acc_threshold)
                 vx_now = vx_pre + t_interval*(x_acc + accx_pre) / 2
                 vy_now = vy_pre + t_interval*(y_acc + accy_pre) / 2
                 #acc 값도 작고 velocity 값도 threshold보다 작으면 0으로 초기화
@@ -98,9 +100,9 @@ if __name__ == '__main__':
                 if y_acc == 0:
                     vy_now = init_var(vy_now)
 
-                #dist = cm
-                distx += (t_interval*(vx_pre + vx_now) / 2) * 100
-                disty += (t_interval*(vy_pre + vy_now) / 2) * 100
+                #dist = M
+                distx += (t_interval*(vx_pre + vx_now) / 2)
+                disty += (t_interval*(vy_pre + vy_now) / 2)
                 if vx_now == 0:
                     distx = init_var(distx)
                 if vy_now == 0:
@@ -108,12 +110,16 @@ if __name__ == '__main__':
 
                 print("accx : {:f}, accy : {:f}, vx : {:f}, vy : {:f}".format(x_acc, y_acc, vx_now, vy_now))
 
-                #cm to pixel 
-                pixelx = distx * dpi / 2.54 * 10
-                pixely = disty * dpi / 2.54 * 10
+                #cm to pixel per inch
+                pixelx = distx * dpi * 39.37 * 100
+                pixely = disty * dpi * 39.37 * 100
 
                 print("time : {:f}, x : {:f} {:f}, y : {:f} {:f}\n".format(t_interval, distx, pixelx, disty, pixely))
-                gui.move(int(pixelx),int(pixely))
+                gui.move(-int(pixelx),-int(pixely))
+                
+                pos_x, pos_y = gui.position()
+                pos_x = pos_x if pos_x <= screenWidth else screenWidth
+                pos_y = pos_y if pos_y <= screenHeight else screenHeight
                 
                 #print(x_acc, y_acc)
 
